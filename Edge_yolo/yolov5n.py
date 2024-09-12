@@ -1,7 +1,6 @@
 import torch
 
-model = torch.hub.load("ultralytics/yolov5", "yolov5n")
-
+#model = torch.hub.load("ultralytics/yolov5", "yolov5n")#从网络上下载yolov5n的模型与权重
 
 
 import cv2
@@ -14,6 +13,7 @@ input_size=(640, 640)
 cap = cv2.VideoCapture(0)
 
 # 定义预处理步骤
+
 preprocess = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
@@ -21,9 +21,28 @@ preprocess = transforms.Compose([
 ])
 
 
+
+
+import sys
+
+sys.path.append('Edge_yolo/ultralytics')
+
+from models.common import DetectMultiBackend
+model = DetectMultiBackend('Edge_yolo/ultralytics/yolov5n.pt', device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
+#DetectMultiBackend 类被用来加载名为 'Edge_yolo/ultralytics/yolov5n.pt' 的模型权重文件
+
+sys.path.remove('Edge_yolo/ultralytics')
+
+
+
 while True:
     # 从摄像头捕获一帧
     ret, frame = cap.read()
+    #这里的ret是一个bool值，如果捕获成功就是true，反之则是false
+    #frame那就是这一帧的图像咯，形状为（长，宽，3）
+    
+    #print(frame.shape)
+    
     if not ret:
         break
 
@@ -31,12 +50,18 @@ while True:
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)#在OpenCV中，默认的颜色格式是BGR，这是基于原始图像传感器数据的颜色顺序。
                                                 #然而，许多机器学习模型和深度学习框架，包括PyTorch，期望输入数据是RGB格式的。
                                                 #这行代码的作用是将一个BGR格式的图像转换为RGB格式的图像。
+    #print(image.shape)
     image = preprocess(image)
+    #print(image.shape)
     image = torch.unsqueeze(image, 0)  # 添加批处理维度
+    #print(image.shape)
 
     # 使用模型进行推理
     with torch.no_grad():
         prediction = model(image)
+
+    print(type(prediction))
+    
 
     # 处理预测结果
     # ...
