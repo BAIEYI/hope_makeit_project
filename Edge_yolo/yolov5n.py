@@ -1,0 +1,53 @@
+import torch
+
+model = torch.hub.load("ultralytics/yolov5", "yolov5n")
+
+
+
+import cv2
+import torchvision.transforms as transforms
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+
+input_size=(640, 640)
+
+# 初始化摄像头
+cap = cv2.VideoCapture(0)
+
+# 定义预处理步骤
+preprocess = transforms.Compose([
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+    transforms.Resize(input_size)  # 假设模型的输入尺寸是固定的，这里需要替换为实际的尺寸
+])
+
+
+while True:
+    # 从摄像头捕获一帧
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # 将摄像头捕获的帧转换为模型可以接受的格式
+    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)#在OpenCV中，默认的颜色格式是BGR，这是基于原始图像传感器数据的颜色顺序。
+                                                #然而，许多机器学习模型和深度学习框架，包括PyTorch，期望输入数据是RGB格式的。
+                                                #这行代码的作用是将一个BGR格式的图像转换为RGB格式的图像。
+    image = preprocess(image)
+    image = torch.unsqueeze(image, 0)  # 添加批处理维度
+
+    # 使用模型进行推理
+    with torch.no_grad():
+        prediction = model(image)
+
+    # 处理预测结果
+    # ...
+
+    # 显示摄像头捕获的帧
+    cv2.imshow('Camera', frame)
+
+    # 按'q'退出循环
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# 释放摄像头和关闭窗口
+cap.release()
+cv2.destroyAllWindows()
