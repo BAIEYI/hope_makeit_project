@@ -1,11 +1,16 @@
 import torch
 
+#获得模型方法一
 #model = torch.hub.load("ultralytics/yolov5", "yolov5n")#从网络上下载yolov5n的模型与权重
 
 
 import cv2
 import torchvision.transforms as transforms
 from torchvision.models.detection import fasterrcnn_resnet50_fpn
+
+
+
+
 
 input_size=(640, 640)
 
@@ -22,16 +27,27 @@ preprocess = transforms.Compose([
 
 
 
-
+"""#获得模型方法二
 import sys
 
 sys.path.append('Edge_yolo/ultralytics')
 
-from models.common import DetectMultiBackend
+from models.common import DetectMultiBackend # type: ignore
 model = DetectMultiBackend('Edge_yolo/ultralytics/yolov5n.pt', device=torch.device('cuda' if torch.cuda.is_available() else 'cpu'))
 #DetectMultiBackend 类被用来加载名为 'Edge_yolo/ultralytics/yolov5n.pt' 的模型权重文件
 
 sys.path.remove('Edge_yolo/ultralytics')
+
+"""
+
+
+#获得模型方法三
+from ultralytics import YOLO
+model = YOLO('yolov5n.pt') 
+
+
+
+
 
 
 
@@ -42,7 +58,8 @@ while True:
     #frame那就是这一帧的图像咯，形状为（长，宽，3）
     
     #print(frame.shape)
-    
+    print(type(frame))
+
     if not ret:
         break
 
@@ -61,6 +78,7 @@ while True:
         prediction = model(image)
 
     print(type(prediction))
+    prediction.show()
     
 
     # 处理预测结果
