@@ -108,7 +108,7 @@ cv2.destroyAllWindows()
 
             # Render the predictions on the frame
             frame = results # get the first image
-
+            
             print(frame)
             print("看大雪如何衰老的，你的眼睛如何融化？？？\n")
             
@@ -118,6 +118,7 @@ cv2.destroyAllWindows()
             # Display the resulting frame using matplotlib
             plt.imshow(frame_rgb)
             plt.show()
+
 
         # Release the VideoCapture object
     if cv2.waitKey(1) & 0xFF == ord('q'):
