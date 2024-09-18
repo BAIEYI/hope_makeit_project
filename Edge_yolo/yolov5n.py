@@ -43,10 +43,13 @@ sys.path.remove('Edge_yolo/ultralytics')
 
 #获得模型方法三
 from ultralytics import YOLO
-model = YOLO('yolov5n.pt') 
+model = YOLO('yolov8n.pt',task='detect') 
 
 
 
+from tabnanny import verbose
+import cv2
+import matplotlib.pyplot as plt
 
 
 
@@ -56,7 +59,7 @@ while True:
     ret, frame = cap.read()
     #这里的ret是一个bool值，如果捕获成功就是true，反之则是false
     #frame那就是这一帧的图像咯，形状为（长，宽，3）
-    
+    """   
     #print(frame.shape)
     print(type(frame))
 
@@ -94,3 +97,30 @@ while True:
 # 释放摄像头和关闭窗口
 cap.release()
 cv2.destroyAllWindows()
+    """
+
+    if ret:
+            # Perform prediction on the frame
+            results = model(frame,verbose=False)
+
+            print(frame)
+            print("如果有一天，你会来看一看我吗？？？\n")
+
+            # Render the predictions on the frame
+            frame = results # get the first image
+
+            print(frame)
+            print("看大雪如何衰老的，你的眼睛如何融化？？？\n")
+            
+            # Convert the image from BGR to RGB
+            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # Display the resulting frame using matplotlib
+            plt.imshow(frame_rgb)
+            plt.show()
+
+        # Release the VideoCapture object
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+cap.release()
+
